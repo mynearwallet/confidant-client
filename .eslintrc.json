@@ -1,0 +1,45 @@
+{
+  "env": {
+    "browser": true,
+    "es6": true,
+    "jest": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": ["tsconfig.json"],
+    "tsconfigRootDir": "."
+  },
+  "plugins": ["jest"],
+  "rules": {
+    "curly": ["error", "multi", "consistent"],
+    "padding-line-between-statements": [
+      "error",
+      { "blankLine": "always", "prev": "*", "next": "return" }
+    ],
+    "max-len": ["error", { "code": 90 }],
+    "quotes": [2, "single", { "avoidEscape": true }],
+    "semi": "error",
+    "curly": ["error", "all"],
+    "no-console": "off",
+    "object-curly-spacing": ["error", "always"],
+    "@typescript-eslint/no-unused-vars": ["error"],
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/explicit-member-accessibility": "off",
+    "@typescript-eslint/camelcase": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/no-namespace": "off"
+  },
+  "ignorePatterns": [],
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".ts", ".d.ts"]
+      }
+    }
+  }
+}

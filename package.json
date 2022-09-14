@@ -1,0 +1,39 @@
+{
+  "name": "confidant-client",
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mynearwallet/confidant-client.git"
+  },
+  "author": {
+    "name": "Artem",
+    "email": "artem@mynearwallet.com"
+  },
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "types": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "prepublishOnly": "npm install && npm run test && npm run build"
+  },
+  "dependencies": {
+    "js-sha256": "^0.9.0",
+    "multisign": "git+https://github.com/mynearwallet/multisign#f6f9ac314b7abca68187ef68bd9494d8468725ab",
+    "near-api-js": "^0.44.2",
+    "near-seed-phrase": "^0.2.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^28.1.3",
+    "@typescript-eslint/eslint-plugin": "^5.25.0",
+    "@typescript-eslint/parser": "^5.25.0",
+    "eslint": "^8.20.0",
+    "eslint-plugin-jest": "^26.2.2",
+    "eslint-plugin-testing-library": "^5.5.0",
+    "jest": "^28.1.2",
+    "ts-jest": "^28.0.5",
+    "typescript": "^4.6.4"
+  },
+  "license": "MIT"
+}
