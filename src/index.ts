@@ -28,10 +28,11 @@ export default class Confidant {
         return createKeyPairEd25519.fromString(parseSeedPhrase(phrase).secretKey);
     }
 
-    public async getKeyPair(
+    public getKeyPair = async(
         accountId: string
-    ): Promise<NearApiJs.utils.KeyPairEd25519|null> {
-        const key = await this.getKeyStore().getKey(
+    ): Promise<NearApiJs.utils.KeyPairEd25519|null> => {
+        const keyStore = this.getKeyStore();
+        const key = await keyStore.getKey(
             this.networkConfig.networkId,
             accountId
         );
@@ -43,12 +44,12 @@ export default class Confidant {
          */
         /* eslint-enable max-len */
         return key as NearApiJs.utils.KeyPairEd25519;
-    }
+    };
 
-    public async handshake(
+    public handshake = async(
         accountId: string,
         secret: string,
-    ): Promise<void> {
+    ): Promise<void> => {
         const newKeyPair = NearApiJs.utils.KeyPairEd25519.fromRandom();
         await this.saveKeyPairLocally(accountId, newKeyPair);
         const handshakeResponse = await this.confidantService.handshake(
@@ -60,7 +61,7 @@ export default class Confidant {
             .fromString(handshakeResponse.combinedKey);
         const secretKeyPair = createKeyPairEd25519.fromString(secret);
         await this.addPublicKey(accountId, secretKeyPair, combinedKey);
-    }
+    };
 
     public signAndSendTransaction = async (
         accountId: string,
@@ -112,7 +113,8 @@ export default class Confidant {
         accountId: string,
         keyPair: NearApiJs.utils.KeyPairEd25519
     ): Promise<void> {
-        await this.getKeyStore().setKey(this.networkConfig.networkId, accountId, keyPair);
+        const keyStore = this.getKeyStore();
+        await keyStore.setKey(this.networkConfig.networkId, accountId, keyPair);
     }
 
     private async addPublicKey(
