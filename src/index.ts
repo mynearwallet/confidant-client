@@ -13,6 +13,11 @@ export default class Confidant {
     private networkConfig: NearApiJs.ConnectConfig;
     private confidantService: ConfidantService;
     private keyPrefix?: string;
+    public qrCode: typeof ConfidantService.prototype.qrCode;
+    public hasAuth: typeof ConfidantService.prototype.hasAuth;
+    public createGoogTwoFA: typeof ConfidantService.prototype.createGoogTwoFA;
+    public activateGoogTwoFA: typeof ConfidantService.prototype.activateGoogTwoFA;
+    public deactivateGoogTwoFA: typeof ConfidantService.prototype.deactivateGoogTwoFA;
 
     constructor(
         address: string,
@@ -22,16 +27,28 @@ export default class Confidant {
         this.networkConfig = networkConfig;
         this.confidantService = new ConfidantService(address);
         this.keyPrefix = keyPrefix;
+
+        this.qrCode = this.confidantService.qrCode
+            .bind(this.confidantService);
+        this.hasAuth = this.confidantService.hasAuth
+            .bind(this.confidantService);
+        this.createGoogTwoFA = this.confidantService.createGoogTwoFA
+            .bind(this.confidantService);
+        this.activateGoogTwoFA = this.confidantService.activateGoogTwoFA
+            .bind(this.confidantService);
+        this.deactivateGoogTwoFA = this.confidantService.deactivateGoogTwoFA
+            .bind(this.confidantService);
     }
 
     public static keyPairBySeedPhrase(phrase: string): NearApiJs.utils.KeyPairEd25519 {
         return createKeyPairEd25519.fromString(parseSeedPhrase(phrase).secretKey);
     }
 
-    public async getKeyPair(
+    public getKeyPair = async(
         accountId: string
-    ): Promise<NearApiJs.utils.KeyPairEd25519|null> {
-        const key = await this.getKeyStore().getKey(
+    ): Promise<NearApiJs.utils.KeyPairEd25519|null> => {
+        const keyStore = this.getKeyStore();
+        const key = await keyStore.getKey(
             this.networkConfig.networkId,
             accountId
         );
@@ -43,12 +60,12 @@ export default class Confidant {
          */
         /* eslint-enable max-len */
         return key as NearApiJs.utils.KeyPairEd25519;
-    }
+    };
 
-    public async handshake(
+    public handshake = async(
         accountId: string,
         secret: string,
-    ): Promise<void> {
+    ): Promise<void> => {
         const newKeyPair = NearApiJs.utils.KeyPairEd25519.fromRandom();
         await this.saveKeyPairLocally(accountId, newKeyPair);
         const handshakeResponse = await this.confidantService.handshake(
@@ -60,7 +77,7 @@ export default class Confidant {
             .fromString(handshakeResponse.combinedKey);
         const secretKeyPair = createKeyPairEd25519.fromString(secret);
         await this.addPublicKey(accountId, secretKeyPair, combinedKey);
-    }
+    };
 
     public signAndSendTransaction = async (
         accountId: string,
@@ -112,7 +129,8 @@ export default class Confidant {
         accountId: string,
         keyPair: NearApiJs.utils.KeyPairEd25519
     ): Promise<void> {
-        await this.getKeyStore().setKey(this.networkConfig.networkId, accountId, keyPair);
+        const keyStore = this.getKeyStore();
+        await keyStore.setKey(this.networkConfig.networkId, accountId, keyPair);
     }
 
     private async addPublicKey(

@@ -2,14 +2,9 @@
 const path = require('path');
 const webpack = require("webpack");
 
-new webpack.ProvidePlugin({
-    process: 'process/browser',
-    Buffer: ['buffer', 'Buffer'],
-});
-
-
 module.exports = {
     mode: 'development',
+    devtool: 'inline-source-map',
     entry: './src/index.ts',
     output: {
         filename: 'index.js',
@@ -18,13 +13,22 @@ module.exports = {
         libraryTarget: 'umd',
         globalObject: 'this'
     },
+    plugins: [
+        new webpack.ProvidePlugin({
+            Buffer: ['buffer', 'Buffer'],
+        }),
+        new webpack.ProvidePlugin({
+            process: 'process/browser',
+        }),
+    ],
     resolve: {
         extensions: ['.ts', '.js'],
         fallback: {
             util: require.resolve('util/'),
             path: require.resolve('path-browserify'),
+            crypto: require.resolve('crypto-browserify'),
             stream: require.resolve('stream-browserify'),
-            crypto: require.resolve('crypto-browserify')
+            buffer: require.resolve('buffer'),
         }
     },
     module: {

@@ -14,7 +14,7 @@
   },
   "types": "src/index.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "webpack",
     "test": "jest",
     "prepublishOnly": "npm install && npm run test && npm run build"
   },
