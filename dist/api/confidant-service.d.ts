@@ -20,7 +20,7 @@ export default class ConfidantService {
     constructor(address: string);
     handshake: (publicKey: string, pkhash: string) => Promise<HandshakeResponse>;
     getCombinedKey: (publicKey: string) => Promise<GetCombinedKeyResponse>;
-    signTransaction: (message: string, data: string, clientPublicKey: string, auth?: AuthData | undefined) => Promise<SignTransactionResponse>;
+    signTransaction: (message: string, data: string, clientPublicKey: string, auth?: AuthData) => Promise<SignTransactionResponse>;
     qrCode: (url: string) => Promise<Blob>;
     hasAuth: (publicKey: string) => Promise<AuthStatus>;
     createGoogTwoFA: (accountId: string, publicKey: string) => Promise<Blob>;
