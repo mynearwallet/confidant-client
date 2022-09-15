@@ -2,11 +2,6 @@
 const path = require('path');
 const webpack = require("webpack");
 
-// new webpack.ProvidePlugin({
-//     process: 'process/browser'
-// })
-
-
 new webpack.ProvidePlugin({
     process: 'process/browser',
     Buffer: ['buffer', 'Buffer'],
@@ -15,7 +10,6 @@ new webpack.ProvidePlugin({
 
 module.exports = {
     mode: 'development',
-    // devtool: 'inline-source-map',
     entry: './src/index.ts',
     output: {
         filename: 'index.js',
