@@ -13,6 +13,11 @@ export default class Confidant {
     private networkConfig: NearApiJs.ConnectConfig;
     private confidantService: ConfidantService;
     private keyPrefix?: string;
+    public qrCode: typeof ConfidantService.prototype.qrCode;
+    public hasAuth: typeof ConfidantService.prototype.hasAuth;
+    public createGoogTwoFA: typeof ConfidantService.prototype.createGoogTwoFA;
+    public activateGoogTwoFA: typeof ConfidantService.prototype.activateGoogTwoFA;
+    public deactivateGoogTwoFA: typeof ConfidantService.prototype.deactivateGoogTwoFA;
 
     constructor(
         address: string,
@@ -22,6 +27,17 @@ export default class Confidant {
         this.networkConfig = networkConfig;
         this.confidantService = new ConfidantService(address);
         this.keyPrefix = keyPrefix;
+
+        this.qrCode = this.confidantService.qrCode
+            .bind(this.confidantService);
+        this.hasAuth = this.confidantService.hasAuth
+            .bind(this.confidantService);
+        this.createGoogTwoFA = this.confidantService.createGoogTwoFA
+            .bind(this.confidantService);
+        this.activateGoogTwoFA = this.confidantService.activateGoogTwoFA
+            .bind(this.confidantService);
+        this.deactivateGoogTwoFA = this.confidantService.deactivateGoogTwoFA
+            .bind(this.confidantService);
     }
 
     public static keyPairBySeedPhrase(phrase: string): NearApiJs.utils.KeyPairEd25519 {
