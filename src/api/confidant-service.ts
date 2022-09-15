@@ -33,7 +33,7 @@ export default class ConfidantService {
       publicKey: string,
       pkhash: string,
   ): Promise<HandshakeResponse> => {
-    return this.request('/api/handshake', {
+    return this.request('/api/account/handshake', {
       body: {
         publicKey,
         pkhash,
@@ -42,7 +42,7 @@ export default class ConfidantService {
   };
 
   public getCombinedKey = (publicKey: string): Promise<GetCombinedKeyResponse> => {
-    return this.request('/api/key', {
+    return this.request('/api/account/key', {
       body: { clientPublicKey: publicKey }
     });
   };
@@ -53,7 +53,7 @@ export default class ConfidantService {
       clientPublicKey: string,
       auth?: AuthData,
   ): Promise<SignTransactionResponse> => {
-    return this.request('/api/sign', {
+    return this.request('/api/account/sign', {
       body: {
         message: message,
         data,
