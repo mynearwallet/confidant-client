@@ -1,13 +1,8 @@
 import * as NearApiJs from 'near-api-js';
-import { ConnectConfig } from 'near-api-js';
-import { PublicKey } from 'near-api-js/lib/utils';
-import { KeyPairEd25519 } from 'near-api-js/lib/utils/key_pair';
-import { Action, SignedTransaction } from 'near-api-js/lib/transaction';
-import { BrowserLocalStorageKeyStore } from 'near-api-js/lib/key_stores';
 import { AccessKeyView,  QueryResponseKind } from 'near-api-js/lib/providers/provider';
 import sha256 from 'js-sha256';
 import { parseSeedPhrase } from 'near-seed-phrase';
-import * as Multisig from 'multisign/dist/client';
+import * as Multisig from 'multisign/client';
 import nacl from 'tweetnacl';
 import ConfidantService, { AuthData as AuthApiData } from './api/confidant-service';
 import createKeyPairEd25519 from './lib/crypto';
@@ -15,13 +10,13 @@ import createKeyPairEd25519 from './lib/crypto';
 export type AuthData = AuthApiData;
 
 export default class Confidant {
-    private networkConfig: ConnectConfig;
+    private networkConfig: NearApiJs.ConnectConfig;
     private confidantService: ConfidantService;
     private keyPrefix?: string;
 
     constructor(
         address: string,
-        networkConfig: ConnectConfig,
+        networkConfig: NearApiJs.ConnectConfig,
         keyPrefix?: string,
     ) {
         this.networkConfig = networkConfig;
@@ -29,11 +24,13 @@ export default class Confidant {
         this.keyPrefix = keyPrefix;
     }
 
-    public static keyPairBySeedPhrase(phrase: string): KeyPairEd25519 {
+    public static keyPairBySeedPhrase(phrase: string): NearApiJs.utils.KeyPairEd25519 {
         return createKeyPairEd25519.fromString(parseSeedPhrase(phrase).secretKey);
     }
 
-    public async getKeyPair(accountId: string): Promise<KeyPairEd25519|null> {
+    public async getKeyPair(
+        accountId: string
+    ): Promise<NearApiJs.utils.KeyPairEd25519|null> {
         const key = await this.getKeyStore().getKey(
             this.networkConfig.networkId,
             accountId
@@ -45,7 +42,7 @@ export default class Confidant {
          * @link {https://github.com/near/near-api-js/blob/master/src/key_stores/browser_local_storage_key_store.ts#L60}
          */
         /* eslint-enable max-len */
-        return key as KeyPairEd25519;
+        return key as NearApiJs.utils.KeyPairEd25519;
     }
 
     public async handshake(
@@ -68,7 +65,7 @@ export default class Confidant {
     public signAndSendTransaction = async (
         accountId: string,
         reciever: string,
-        action: Action|Action[],
+        action: NearApiJs.transactions.Action|NearApiJs.transactions.Action[],
         auth?: AuthData,
     ) => {
         const combinedPublicKey = await this.getCombinedKey(accountId);
@@ -113,15 +110,15 @@ export default class Confidant {
 
     private async saveKeyPairLocally(
         accountId: string,
-        keyPair: KeyPairEd25519
+        keyPair: NearApiJs.utils.KeyPairEd25519
     ): Promise<void> {
         await this.getKeyStore().setKey(this.networkConfig.networkId, accountId, keyPair);
     }
 
     private async addPublicKey(
         accountId: string,
-        accessKeyPair: KeyPairEd25519,
-        publicKey: PublicKey
+        accessKeyPair: NearApiJs.utils.KeyPairEd25519,
+        publicKey: NearApiJs.utils.PublicKey
     ): Promise<void> {
         const memoryKeyStore = new NearApiJs.keyStores.InMemoryKeyStore();
         memoryKeyStore.setKey(
@@ -139,7 +136,7 @@ export default class Confidant {
         await account.addKey(publicKey);
     }
 
-    private async getCombinedKey(accountId: string): Promise<PublicKey> {
+    private async getCombinedKey(accountId: string): Promise<NearApiJs.utils.PublicKey> {
         const keyPair = await this.getKeyPair(accountId);
 
         if (!keyPair) {
@@ -155,7 +152,7 @@ export default class Confidant {
 
     private async getAccessKey<T extends QueryResponseKind & AccessKeyView>(
         accountId: string,
-        publicKey: PublicKey
+        publicKey: NearApiJs.utils.PublicKey
     ): Promise<T> {
         const provider = new NearApiJs.providers.JsonRpcProvider(
             this.networkConfig.nodeUrl
@@ -172,7 +169,7 @@ export default class Confidant {
         privateKey: NearApiJs.utils.KeyPairEd25519,
         combinedPublicKey: NearApiJs.utils.PublicKey,
         auth?: AuthData,
-    ): Promise<SignedTransaction|null> {
+    ): Promise<NearApiJs.transactions.SignedTransaction|null> {
         const step1 = Multisig.multiSignStep1();
         const encodedTransaction = transaction.encode();
 
@@ -230,7 +227,9 @@ export default class Confidant {
         return signedTransaction;
     }
 
-    private sendSignedTransaction<T>(transaction: SignedTransaction): Promise<T> {
+    private sendSignedTransaction<T>(
+        transaction: NearApiJs.transactions.SignedTransaction
+    ): Promise<T> {
         const signedSerializedTransaction = transaction.encode();
         // sends transaction to NEAR blockchain via JSON RPC call and records the result
         const provider = new NearApiJs.providers.JsonRpcProvider(
@@ -242,8 +241,8 @@ export default class Confidant {
         ]);
     }
 
-    private getKeyStore(): BrowserLocalStorageKeyStore {
-        const keyStore = new BrowserLocalStorageKeyStore(
+    private getKeyStore(): NearApiJs.keyStores.BrowserLocalStorageKeyStore {
+        const keyStore = new NearApiJs.keyStores.BrowserLocalStorageKeyStore(
             window.localStorage,
             this.keyPrefix
         );
