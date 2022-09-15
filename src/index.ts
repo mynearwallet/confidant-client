@@ -9,8 +9,10 @@ import sha256 from 'js-sha256';
 import { parseSeedPhrase } from 'near-seed-phrase';
 import * as Multisig from 'multisign/dist/client';
 import nacl from 'tweetnacl';
-import ConfidantService, { AuthData } from './api/confidant-service';
+import ConfidantService, { AuthData as AuthApiData } from './api/confidant-service';
 import createKeyPairEd25519 from './lib/crypto';
+
+export type AuthData = AuthApiData;
 
 export default class Confidant {
     private networkConfig: ConnectConfig;
@@ -29,6 +31,21 @@ export default class Confidant {
 
     public static keyPairBySeedPhrase(phrase: string): KeyPairEd25519 {
         return createKeyPairEd25519.fromString(parseSeedPhrase(phrase).secretKey);
+    }
+
+    public async getKeyPair(accountId: string): Promise<KeyPairEd25519|null> {
+        const key = await this.getKeyStore().getKey(
+            this.networkConfig.networkId,
+            accountId
+        );
+
+        /* eslint-disable max-len */
+        /**
+         * No generic type
+         * @link {https://github.com/near/near-api-js/blob/master/src/key_stores/browser_local_storage_key_store.ts#L60}
+         */
+        /* eslint-enable max-len */
+        return key as KeyPairEd25519;
     }
 
     public async handshake(
@@ -148,21 +165,6 @@ export default class Confidant {
             `access_key/${accountId}/${publicKey.toString()}`,
             ''
         );
-    }
-
-    private async getKeyPair(accountId: string): Promise<KeyPairEd25519|null> {
-        const key = await this.getKeyStore().getKey(
-            this.networkConfig.networkId,
-            accountId
-        );
-
-        /* eslint-disable max-len */
-        /**
-         * No generic type
-         * @link {https://github.com/near/near-api-js/blob/master/src/key_stores/browser_local_storage_key_store.ts#L60}
-         */
-        /* eslint-enable max-len */
-        return key as KeyPairEd25519;
     }
 
     private async multisigSign(

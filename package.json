@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "js-sha256": "^0.9.0",
-    "multisign": "git+https://github.com/mynearwallet/multisign#f6f9ac314b7abca68187ef68bd9494d8468725ab",
+    "multisign": "git+https://github.com/mynearwallet/multisign#5aca39406ad1d26bc9536c47987316569fbd0bbf",
     "near-api-js": "^0.44.2",
     "near-seed-phrase": "^0.2.0"
   },
